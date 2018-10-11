@@ -16,7 +16,7 @@ SEPARATOR results in spaces between the values returned by FUNCTION.
 SEQUENCE may be a list, a vector, a bool-vector, or a string.
 #+end_quote
 *** Nimy-Lisp version
-The order of FUNCTION (op) and SEQUENCE (s) have been switched so that
+The order of FUNCTION (op) and SEQUENCE (s) has been switched so that
 we can do ~s.mapconcat()~ in Nim.
 #+begin_quote
 ~proc mapconcat*[T](s: openArray[T]; op: proc(x: T): string = dollar; sep = " "): string =~
