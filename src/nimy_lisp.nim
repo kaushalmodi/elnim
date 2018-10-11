@@ -6,8 +6,10 @@ proc dollar[T](s: T): string =
 proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =
   ## Concatenate elements of ``s`` after applying ``op`` to each element.
   ## Separate each element using ``sep``.
-  for x in s:
-    result.add op(x) & sep
+  for i, x in s:
+    result.add(op(x))
+    if i < s.len-1:
+      result.add(sep)
 
 when isMainModule:
   import strformat
