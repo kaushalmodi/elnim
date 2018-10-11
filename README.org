@@ -1,0 +1,26 @@
+#+title: Nimy Lisp
+#+author: Kaushal Modi
+
+Collection of Nim procs and templates which can serve as "phew! I am
+glad Nim has this!" for Emacs/Emacs-Lisp/Lisp enthusiasts.
+
+* List/Sequence/Array procs
+** ~mapconcat~
+*** Emacs-Lisp version
+#+begin_quote
+~(mapconcat FUNCTION SEQUENCE SEPARATOR)~
+
+Apply FUNCTION to each element of SEQUENCE, and concat the results as strings.
+In between each pair of results, stick in SEPARATOR.  Thus, " " as
+SEPARATOR results in spaces between the values returned by FUNCTION.
+SEQUENCE may be a list, a vector, a bool-vector, or a string.
+#+end_quote
+*** Nimy-Lisp version
+The order of FUNCTION (op) and SEQUENCE (s) have been switched so that
+we can do ~s.mapconcat()~ in Nim.
+#+begin_quote
+~proc mapconcat*[T](s: openArray[T]; op: proc(x: T): string = dollar; sep = " "): string =~
+#+end_quote
+* TODO Action Items
+- [ ] Remove the manual pasting of nim procs here once the docs are
+  generated using ~nim doc~.
