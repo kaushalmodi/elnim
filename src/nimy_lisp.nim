@@ -17,8 +17,10 @@ when isMainModule:
     s1 = @["abc", "def", "ghi"]
     s2 = ["abc", "def", "ghi"]
     s3 = [1, 2, 3]
+    s4: seq[string] = @[]
   echo fmt"`{s1.mapconcat()}'"
   echo fmt"`{s2.mapconcat()}'"
   echo fmt"`{s3.mapconcat()}'"
+  echo fmt"`{s4.mapconcat()}'"
   let foo = s3.mapconcat("\n", proc(x: int): string = "Ha: " & $x)
   echo fmt"`{foo}'"
