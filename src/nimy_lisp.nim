@@ -8,19 +8,20 @@ proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar):
   ## Separate each element using ``sep``.
   for i, x in s:
     result.add(op(x))
-    if i < s.len-1:
+    if i < s.high:
       result.add(sep)
 
 when isMainModule:
-  import strformat
   let
     s1 = @["abc", "def", "ghi"]
     s2 = ["abc", "def", "ghi"]
     s3 = [1, 2, 3]
     s4: seq[string] = @[]
-  echo fmt"`{s1.mapconcat()}'"
-  echo fmt"`{s2.mapconcat()}'"
-  echo fmt"`{s3.mapconcat()}'"
-  echo fmt"`{s4.mapconcat()}'"
-  let foo = s3.mapconcat("\n", proc(x: int): string = "Ha: " & $x)
-  echo fmt"`{foo}'"
+
+  doAssert s1.mapconcat() == "abc def ghi"
+  doAssert s2.mapconcat() == "abc def ghi"
+  doAssert s3.mapconcat() == "1 2 3"
+  doAssert s3.mapconcat("\n", proc(x: int): string = "Ha: " & $x) == "Ha: 1\nHa: 2\nHa: 3"
+  doAssert s4.mapconcat() == ""
+
+  echo "\nTests passed!"

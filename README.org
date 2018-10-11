@@ -4,6 +4,10 @@
 Collection of Nim procs and templates which can serve as "phew! I am
 glad Nim has this!" for Emacs/Emacs-Lisp/Lisp enthusiasts.
 
+* Testing
+#+begin_example
+nimble test
+#+end_example
 * List/Sequence/Array procs
 ** ~mapconcat~
 *** Emacs-Lisp version

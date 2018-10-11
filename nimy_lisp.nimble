@@ -10,3 +10,11 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 0.19.1"
+
+import ospaths # for `/`
+let
+  pkgName = "nimy_lisp"
+  srcFile = "src" / (pkgName & ".nim")
+
+task test, "Run tests in nimy_lisp.nim":
+  exec("nim c -r " & srcFile)
