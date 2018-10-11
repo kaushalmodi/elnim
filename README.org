@@ -16,10 +16,12 @@ SEPARATOR results in spaces between the values returned by FUNCTION.
 SEQUENCE may be a list, a vector, a bool-vector, or a string.
 #+end_quote
 *** Nimy-Lisp version
-The order of FUNCTION (op) and SEQUENCE (s) has been switched so that
-we can do ~s.mapconcat()~ in Nim.
+The Nimy-Lisp proc has a different signature than the Emacs equivalent,
+- so that we can do ~s.mapconcat()~ in Nim.
+- Also it is more common for a user to change the ~sep~ parameter than
+  the ~op~ parameter, so move ~op~ to the last position.
 #+begin_quote
-~proc mapconcat*[T](s: openArray[T]; op: proc(x: T): string = dollar; sep = " "): string =~
+~proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =~
 #+end_quote
 * TODO Action Items
 - [ ] Remove the manual pasting of nim procs here once the docs are
