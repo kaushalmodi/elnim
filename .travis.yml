@@ -46,6 +46,7 @@ script:
 before_deploy:
   - mkdir -p "${DEPLOYDIR}"
   - mv "${HTMLFILE}" "${DEPLOYDIR}"/index.html
+
 deploy:
   provider: pages
   # local-dir *has* to be a relative path from the repo root.
@@ -55,6 +56,11 @@ deploy:
   keep-history: false
   on:
     branch: master
+
+notifications:
+  email:
+    on_success: never # default: change
+    on_failure: always # default: always
 
 # References:
 # https://github.com/kaushalmodi/hello_musl/blob/master/.travis.yml
