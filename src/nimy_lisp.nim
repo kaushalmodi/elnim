@@ -1,4 +1,4 @@
-import sequtils
+## This module implements few Emacs-Lisp equivalent procs.
 
 proc dollar[T](s: T): string =
   result = $s
@@ -6,6 +6,11 @@ proc dollar[T](s: T): string =
 proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =
   ## Concatenate elements of ``s`` after applying ``op`` to each element.
   ## Separate each element using ``sep``.
+  ##
+  ## The signature of this proc differs from its equivalent ``mapconcat`` in Emacs,
+  ## - so that we can do ``s.mapconcat()`` in Nim.
+  ## - Also it is more common for a user to change the ``sep`` parameter
+  ##   than the ``op`` parameter, so move ``op`` to the last position.
   runnableExamples:
     doAssert @["abc", "def", "ghi"].mapconcat() == "abc def ghi"
     doAssert ["abc", "def", "ghi"].mapconcat() == "abc def ghi"
