@@ -45,12 +45,7 @@ script:
   - nimble test       # Generates doc and tests using runnableExamples
 
 before_deploy:
-  - mkdir -p "${DEPLOYDIR}"
-  - mv "${HTMLFILE}" "${DOCPAGE}"
-  # Delete the line trying to load dochack.js because that script doesn't exist.
-  - sed -i '/dochack/d'  "${DOCPAGE}"
-  # Hack to remove the search box as it doesn't work.
-  - sed -i 's/^\s*div#searchInputDiv ./\0 display: none;/' "${DOCPAGE}"
+  - nimble deploy
 deploy:
   provider: pages
   # local-dir *has* to be a relative path from the repo root.
