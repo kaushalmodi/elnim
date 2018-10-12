@@ -1,0 +1,60 @@
+sudo: false
+
+language: c
+
+cache:
+  directories:
+    - nim
+
+env:
+  global:
+    - NIMREPO="https://github.com/nim-lang/Nim"
+    - NIMVER="$(git ls-remote ${NIMREPO} devel | cut -f 1)"
+    - NIMDIR="${TRAVIS_BUILD_DIR}/nim/${NIMVER}"
+    #
+    - DEPLOYDIR="${TRAVIS_BUILD_DIR}/public"
+    - REPONAME="$(basename ${TRAVIS_BUILD_DIR})" # /travis/build/kaushalmodi/nimy_lisp -> nimy_lisp
+    - NIMFILE="${TRAVIS_BUILD_DIR}/src/${REPONAME}.nim"
+    - HTMLFILE="${TRAVIS_BUILD_DIR}/src/${REPONAME}.html"
+
+install:
+  - echo "NIMDIR = ${NIMDIR}"
+  # After building nim, wipe csources to save on cache space.
+  - "{ [ -f ${NIMDIR}/bin/nim ]; } ||
+      ( rm -rf nim;
+        mkdir -p nim;
+        git clone --single-branch --branch devel --depth=1 ${NIMREPO} ${NIMDIR};
+        cd ${NIMDIR};
+        [ -d csources ] || git clone --depth 1 https://github.com/nim-lang/csources.git;
+        cd csources;
+        sh build.sh;
+        cd ..;
+        ./bin/nim c koch;
+        ./koch boot -d:release;
+        rm -rf csources;
+      )"
+  - "{ [ -f ${NIMDIR}/bin/nimble ]; } ||
+      ( cd ${NIMDIR};
+        ./koch nimble;
+      )"
+  - export PATH="${NIMDIR}/bin:${PATH}"
+
+script:
+  - nim -v
+  - nimble test       # Generates doc and tests using runnableExamples
+
+before_deploy:
+  - mkdir -p "${DEPLOYDIR}"
+  - mv "${HTMLFILE}" "${DEPLOYDIR}"/index.html
+deploy:
+  provider: pages
+  # local-dir *has* to be a relative path from the repo root.
+  local-dir: "public"
+  skip-cleanup: true
+  github-token: "${GITHUB_OAUTH_TOKEN}"
+  keep-history: false
+  on:
+    branch: master
+
+# References:
+# https://github.com/kaushalmodi/hello_musl/blob/master/.travis.yml
