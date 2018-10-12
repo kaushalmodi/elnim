@@ -4,13 +4,14 @@
 Collection of Nim procs and templates which can serve as "phew! I am
 glad Nim has this!" for Emacs/Emacs-Lisp/Lisp enthusiasts.
 
+* Documentation
+[[https://kaushalmodi.github.io/nimy_lisp/]]
 * Testing
 #+begin_example
 nimble test
 #+end_example
-* List/Sequence/Array procs
+* Emacs-Lisp functions implemented
 ** ~mapconcat~
-*** Emacs-Lisp version
 #+begin_quote
 ~(mapconcat FUNCTION SEQUENCE SEPARATOR)~
 
@@ -19,16 +20,7 @@ In between each pair of results, stick in SEPARATOR.  Thus, " " as
 SEPARATOR results in spaces between the values returned by FUNCTION.
 SEQUENCE may be a list, a vector, a bool-vector, or a string.
 #+end_quote
-*** Nimy-Lisp version
-The Nimy-Lisp proc has a different signature than the Emacs equivalent,
-- so that we can do ~s.mapconcat()~ in Nim.
-- Also it is more common for a user to change the ~sep~ parameter than
-  the ~op~ parameter, so move ~op~ to the last position.
-#+begin_quote
-~proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =~
-#+end_quote
 ** ~member~
-*** Emacs-Lisp version
 #+begin_quote
 ~(member ELT LIST)~
 
@@ -37,10 +29,3 @@ For more information check the manuals.
 Return non-nil if ELT is an element of LIST.  Comparison done with ‘equal’.
 The value is actually the tail of LIST whose car is ELT.
 #+end_quote
-*** Nimy-Lisp version
-#+begin_quote
-~proc member*[T](el: T; s: openArray[T]): bool =~
-#+end_quote
-* TODO Action Items
-- [ ] Remove the manual pasting of nim procs here once the docs are
-  generated using ~nim doc~.
