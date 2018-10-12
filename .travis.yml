@@ -12,10 +12,11 @@ env:
     - NIMVER="$(git ls-remote ${NIMREPO} devel | cut -f 1)"
     - NIMDIR="${TRAVIS_BUILD_DIR}/nim/${NIMVER}"
     #
-    - DEPLOYDIR="${TRAVIS_BUILD_DIR}/public"
     - REPONAME="$(basename ${TRAVIS_BUILD_DIR})" # /travis/build/kaushalmodi/nimy_lisp -> nimy_lisp
     - NIMFILE="${TRAVIS_BUILD_DIR}/src/${REPONAME}.nim"
     - HTMLFILE="${TRAVIS_BUILD_DIR}/src/${REPONAME}.html"
+    - DEPLOYDIR="${TRAVIS_BUILD_DIR}/public"
+    - DOCPAGE="${DEPLOYDIR}/index.html"
 
 install:
   - echo "NIMDIR = ${NIMDIR}"
@@ -45,8 +46,11 @@ script:
 
 before_deploy:
   - mkdir -p "${DEPLOYDIR}"
-  - mv "${HTMLFILE}" "${DEPLOYDIR}"/index.html
-
+  - mv "${HTMLFILE}" "${DOCPAGE}"
+  # Delete the line trying to load dochack.js because that script doesn't exist.
+  - sed -i '/dochack/d'  "${DOCPAGE}"
+  # Hack to remove the search box as it doesn't work.
+  - sed -i 's|^\s*div#searchInputDiv {|\0 display: none;|' "${DOCPAGE}"
 deploy:
   provider: pages
   # local-dir *has* to be a relative path from the repo root.
