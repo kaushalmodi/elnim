@@ -1,4 +1,13 @@
+## :Author: Kaushal Modi
+## :License: MIT
+##
+## Introduction
+## ============
 ## This module implements few Emacs-Lisp equivalent procs.
+##
+## Source
+## ======
+## `Repo link <https://github.com/kaushalmodi/nimy_lisp>`_
 
 proc dollar[T](s: T): string =
   result = $s
