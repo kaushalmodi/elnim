@@ -17,4 +17,4 @@ let
   srcFile = "src" / (pkgName & ".nim")
 
 task test, "Run tests in nimy_lisp.nim":
-  exec("nim c -r " & srcFile)
+  exec("nim doc " & srcFile)
