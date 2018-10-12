@@ -27,6 +27,20 @@ The Nimy-Lisp proc has a different signature than the Emacs equivalent,
 #+begin_quote
 ~proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =~
 #+end_quote
+** ~member~
+*** Emacs-Lisp version
+#+begin_quote
+~(member ELT LIST)~
+
+For more information check the manuals.
+
+Return non-nil if ELT is an element of LIST.  Comparison done with ‘equal’.
+The value is actually the tail of LIST whose car is ELT.
+#+end_quote
+*** Nimy-Lisp version
+#+begin_quote
+~proc member*[T](el: T; s: openArray[T]): bool =~
+#+end_quote
 * TODO Action Items
 - [ ] Remove the manual pasting of nim procs here once the docs are
   generated using ~nim doc~.
