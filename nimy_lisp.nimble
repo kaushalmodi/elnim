@@ -17,8 +17,9 @@ let
   pkgName = "nimy_lisp"
   srcFile = thisDir() / "src" / (pkgName & ".nim")
 
-task test, "Run tests via 'nim doc' and runnableExamples":
+task test, "Run tests via 'nim doc' and runnableExamples and tests in tests dir":
   exec("nim doc " & srcFile)
+  exec "nim c -r tests/tWhenLet.nim"
 
 task docs, "Deploy doc html + search index to public/ directory":
   let
