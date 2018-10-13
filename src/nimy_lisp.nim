@@ -9,6 +9,9 @@
 ## ======
 ## `Repo link <https://github.com/kaushalmodi/nimy_lisp>`_
 
+import macros, sequtils
+export sequtils
+
 proc dollar[T](s: T): string =
   result = $s
 
@@ -48,3 +51,83 @@ proc member*[T](el: T; s: openArray[T]): bool =
   result = false
   if s.find(el) >= 0:
     result = true
+
+proc isValid*[T](x: T): bool =
+  when T is bool:
+    result = x
+  elif T is SomeNumber:
+    result = true
+  elif T is array | seq:
+    result = if x.len > 0: true else: false
+  elif (T is proc):
+    result = not x.isNil
+  else:
+    # currently not supported
+    when defined(debugWhenLet):
+      echo "Invalid type: ", $(name(T))
+    result = false
+
+macro when_let*(stmts: untyped): untyped =
+  ## Macro similar to Emacs Lisp's `when-let` macro.
+  ## Takes a set of assignments and checks if all of those
+  ## are valid (in elisp if they are `nil`) by calling `isValid`
+  ## on the values being assigned. If all are valid, the body
+  ## after `op:` will be evaluated, otherwise nothing happens.
+  ## Note: compile with `-d:debugWhenLet` to see its resulting
+  ## code.
+  ##
+  ## ..code-block:
+  ##   when_let:
+  ##     a = 5
+  ##     b = a * 5
+  ##     c = proc(a, b: int): int = a + b
+  ##     op:
+  ##       echo "Output is: ", c(a, b)
+  ##
+  ##   # which will be rewritten to:
+  ##   let
+  ##     a = 5
+  ##     b = a * 5
+  ##     c = proc(a, b: int): int = a + b
+  ##   if [isValid(a), isValid(b), isValid(c)].allIt(it):
+  ##     echo "Output is: ", c(a, b)
+  var letStmts = nnkLetSection.newTree()
+  var opStmts = newStmtList()
+  # iterate over all given statements. If we find an
+  # assignment, add
+  for stmt in stmts:
+    case stmt.kind
+    of nnkAsgn:
+      # convert each assignment to a `nnkIdentDefs`, so it's valid within
+      # a `nnkLetSection`
+      letStmts.add nnkIdentDefs.newTree(
+        stmt[0],
+        newEmptyNode(),
+        stmt[1]
+      )
+    of nnkCall:
+      if stmt[0].repr == "op":
+        # add stmts
+        opStmts.add stmt[1]
+        # afterwards nothing expected, so break
+        break
+    else:
+      error("Unexpected node of kind " & $stmt.kind & " found. Content:\n" & stmt.repr)
+
+  # now call `isValid` on all RHS of the assignments
+  var asgnWith: seq[NimNode]
+  for asgn in letStmts:
+    asgnWith.add nnkCall.newTree(ident"isValid", asgn[2])
+
+  # generate the if statement with the call to `allIt` and the
+  # body of the `op:`
+  let inCheck = quote do:
+    if `asgnWith`.allIt(it):
+      `opStmts`
+
+  # assign everything to the result statements
+  result = newStmtList()
+  result.add letStmts
+  result.add inCheck
+  when defined(debugWhenLet):
+    echo result.repr

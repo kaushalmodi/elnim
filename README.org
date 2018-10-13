@@ -29,3 +29,14 @@ For more information check the manuals.
 Return non-nil if ELT is an element of LIST.  Comparison done with ‘equal’.
 The value is actually the tail of LIST whose car is ELT.
 #+end_quote
+** ~when-let~
+#+begin_quote
+~(when-let* VARLIST &rest BODY)~
+
+Bind variables according to VARLIST and conditionally eval BODY.
+Each binding is evaluated in turn, and evaluation stops if a
+binding value is nil.  If all are non-nil, the value of the last
+form in BODY is returned.
+
+VARLIST is the same as in ‘if-let*’.
+#+end_quote
