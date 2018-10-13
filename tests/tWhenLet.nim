@@ -22,3 +22,14 @@ suite "[when-let]":
         res = "Output is: " & $c(a, b)
     check res == "Output is: 30"
 
+  test "[when-let] multiple line body":
+    var res = ""
+    when_let:
+      a = 5
+      b = a * 5
+      op:
+        let y = a * b
+        proc test(x: int): float =
+          result = x.float
+        res = "y as float / 10.0 = " & $(test(y) / 10.0)
+    check res == "y as float / 10.0 = 12.5"
