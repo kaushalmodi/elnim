@@ -77,3 +77,25 @@ suite "[when-let]":
       op:
         res = "Seq is empty!"
     check res == ""
+
+  test "[when-let] non nil ref object":
+    var obj = new int
+    obj[] = 5
+    var res = 0
+    when_let:
+      a = obj
+      b = 5
+      op:
+        res = obj[] + b
+    check res == 10
+
+  test "[when-let] false due to nil pointer":
+    var somePtr: pointer = nil
+    var res = ""
+    when_let:
+      a = 5
+      b = a * 5
+      c = somePtr
+      op:
+        res = "Pointer is nil: " & $(c.isNil)
+    check res == ""
