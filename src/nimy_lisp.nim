@@ -61,6 +61,8 @@ proc isValid*[T](x: T): bool =
     result = if x.len > 0: true else: false
   elif (T is proc):
     result = not x.isNil
+  elif T is ptr | pointer | ref:
+    result = not x.isNil
   else:
     # currently not supported
     when defined(debugWhenLet):
