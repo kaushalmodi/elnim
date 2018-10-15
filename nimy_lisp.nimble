@@ -19,7 +19,7 @@ let
 
 task test, "Run tests via 'nim doc' and runnableExamples and tests in tests dir":
   exec("nim doc " & srcFile)
-  exec "nim c -r tests/tWhenLet.nim"
+  exec "nim c -r tests/tIfLet.nim"
 
 task docs, "Deploy doc html + search index to public/ directory":
   let
