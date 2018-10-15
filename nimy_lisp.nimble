@@ -12,25 +12,30 @@ srcDir        = "src"
 requires "nim >= 0.19.0"
 
 import ospaths # for `/`
+import strutils # for `%`
 let
   pkgName = "nimy_lisp"
-  srcFile = "src" / (pkgName & ".nim")
-  genDocCmd = "nim doc " & srcFile
-  htmlFile = "src" / (pkgName & ".html")
+  srcFile = thisDir() / "src" / (pkgName & ".nim")
 
 task test, "Run tests via 'nim doc' and runnableExamples":
-  exec(genDocCmd)
+  exec("nim doc " & srcFile)
 
-task deploy, "Deploy doc html to public/index.html":
+task docs, "Deploy doc html + search index to public/ directory":
   let
-    deployDir = "public"
+    deployDir = thisDir() / "public"
     deployHtmlFile = deployDir / "index.html"
-  if not fileExists(htmlFile):
-    exec(genDocCmd)
+    deployIdxFile = deployDir / (pkgName & ".idx")
+    deployJsFile = deployDir / "dochack.js"
+    genDocCmd = "nim doc --index:on -o:$1 $2" % [deployHtmlFile, srcFile]
+    sedCmd = "sed -i 's|" & pkgName & r"\.html|index.html|' " & deployIdxFile
+    genTheIndexCmd = "nim buildIndex -o:$1/theindex.html $1" % [deployDir]
+    docHackJsSource = "http://nim-lang.github.io/Nim/dochack.js" # devel docs dochack.js
   mkDir(deployDir)
-  cpFile(htmlFile, deployHtmlFile)
-  # Delete the line trying to load dochack.js because that script
-  # doesn't exist.
-  exec("sed -i '/dochack/d' " & deployHtmlFile)
-  # Hack to remove the search box as it doesn't work.
-  exec(r"sed -i 's|^\s*div#searchInputDiv {|\0 display: none;|' " & deployHtmlFile)
+  exec(genDocCmd)
+  # Hack: replace pkgName.html with index.html in the .idx file
+  echo "[dbg sed cmd] " & sedCmd
+  exec(sedCmd)
+  exec(genTheIndexCmd)
+  if not fileExists(deployJsFile):
+    withDir deployDir:
+      exec("curl -LO " & docHackJsSource)

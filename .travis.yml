@@ -45,7 +45,7 @@ script:
   - nimble test       # Generates doc and tests using runnableExamples
 
 before_deploy:
-  - nimble deploy
+  - nimble docs
 deploy:
   provider: pages
   # local-dir *has* to be a relative path from the repo root.
