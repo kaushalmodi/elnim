@@ -69,7 +69,7 @@ proc isValid*[T](x: T): bool =
       echo "Invalid type: ", $(name(T))
     result = false
 
-macro if_let*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyNode): untyped =
+macro if_let*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyNode()): untyped =
   ## Macro similar to Emacs Lisp's `when-let` macro.
   ## Takes a set of assignments and checks if all of those
   ## are valid (in elisp if they are `nil`) by calling `isValid`
@@ -93,59 +93,71 @@ macro if_let*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmpty
   ##     c = proc(a, b: int): int = a + b
   ##   if [isValid(a), isValid(b), isValid(c)].allIt(it):
   ##     echo "Output is: ", c(a, b)
-  var
-    letStmts = nnkLetSection.newTree()
-    doStmts = newStmtList()
-    elseStmts = newStmtList()
 
+  var letStmts = nnkLetSection.newTree()
   # iterate over all given statements. If we find an
   # assignment, add
   for e in letExpr:
-    when defined(debugIfLet):
-      echo "[DBG] " & $e.kind & " " & e.repr
-    doAssert e.kind == nnkAsgn,
-     "Unexpected node of kind " & $e.kind & " found. Content:\n" & e.repr
-    # TODO: handle expr like " a3: seq[string] = @[]  " in if_let:
+    case e.kind
+    of nnkAsgn:
+      # convert each assignment to a `nnkIdentDefs`, so it's valid within
+      # a `nnkLetSection`
+      letStmts.add nnkIdentDefs.newTree(
+        e[0],
+        newEmptyNode(),
+        e[1])
+    of nnkCall:
+      # tree like the following
+      # Call
+      #   Ident "a"              # need this
+      #   StmtList
+      #     Asgn                 # and this
+      #       BracketExpr
+      #         Ident "seq"
+      #         Ident "string"
+      #       Prefix
+      #         Ident "@"
+      #         Bracket
+      let
+        letIdent = e[0]
+        asgn = e[1][0]
+      letStmts.add nnkIdentDefs.newTree(
+        letIdent,
+        asgn[0],
+        asgn[1])
+    else:
+      error("Unexpected node of kind " & $e.kind & " found. Content:\n" & e.repr)
 
-    # convert each assignment to a `nnkIdentDefs`, so it's valid within
-    # a `nnkLetSection`
-    letStmts.add nnkIdentDefs.newTree(
-      e[0],
-      newEmptyNode(),
-      e[1])
-
-  when defined(debugIfLet):
-    echo "[DBG] " & $trueCond.kind & " " & trueCond.repr
-  doAssert trueCond.kind == nnkStmtList
-  for e in trueCond:
-    when defined(debugIfLet):
-      echo "[DBG in trueCond] " & $e.kind & " " & e.repr
-    doStmts.add(e)
-
-  when defined(debugIfLet):
-    echo "[DBG] " & $falseCond.kind & " " & falseCond.repr
-  for e in falseCond:
-    when defined(debugIfLet):
-      echo "[DBG in falseCond] " & $e.kind & " " & e.repr
-    elseStmts.add(e)
+  # `newEmptyNode()` isn't really the best solution as an optional arg. Need
+  # to check for `nnkCall` and the symbol identifier
+  var elseStmts = newStmtList()
+  if falseCond.kind == nnkCall and eqIdent(falseCond[0], "newEmptyNode"):
+    elseStmts = quote do:
+      discard
+  else:
+    # get content of `Else` branch
+    elseStmts = falseCond[0]
 
   # now call `isValid` on all RHS of the assignments
   var asgnWith: seq[NimNode]
   for asgn in letStmts:
-    asgnWith.add nnkCall.newTree(ident"isValid", asgn[2])
+    asgnWith.add nnkCall.newTree(ident"isValid", asgn[0])
 
   # generate the if statement with the call to `allIt` and the
   # body of the `op:`
   let inCheck = quote do:
     if `asgnWith`.allIt(it):
-      `doStmts`
+      `trueCond`
     else:
       `elseStmts`
 
   # assign everything to the result statements
   result = newStmtList()
   result.add letStmts
-  result.add inCheck            # TODO: this inCheck block needs to be inside the scope of letStmts, but how?
+  result.add inCheck
+  result = quote do:
+    block:
+      `result`
   when defined(debugIfLet):
     echo result.repr & "\n\n"
 
