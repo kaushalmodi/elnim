@@ -65,21 +65,21 @@ proc isValid*[T](x: T): bool =
     result = not x.isNil
   else:
     # currently not supported
-    when defined(debugWhenLet):
+    when defined(debugIfLet):
       echo "Invalid type: ", $(name(T))
     result = false
 
-macro when_let*(stmts: untyped): untyped =
+macro if_let*(stmts: untyped): untyped =
   ## Macro similar to Emacs Lisp's `when-let` macro.
   ## Takes a set of assignments and checks if all of those
   ## are valid (in elisp if they are `nil`) by calling `isValid`
   ## on the values being assigned. If all are valid, the body
   ## after `op:` will be evaluated, otherwise nothing happens.
-  ## Note: compile with `-d:debugWhenLet` to see its resulting
+  ## Note: compile with `-d:debugIfLet` to see its resulting
   ## code.
   ##
   ## ..code-block:
-  ##   when_let:
+  ##   if_let:
   ##     a = 5
   ##     b = a * 5
   ##     c = proc(a, b: int): int = a + b
@@ -95,6 +95,15 @@ macro when_let*(stmts: untyped): untyped =
   ##     echo "Output is: ", c(a, b)
   var letStmts = nnkLetSection.newTree()
   var opStmts = newStmtList()
+  var elseStmts = newStmtList()
+
+  # check if we have a `false` branch:
+  let haveFalse = if eqIdent(stmts[^1][0], "elsedo"): true else: false
+  if not haveFalse:
+    # in this case just add a `discard` to the `elseStmts`
+    elseStmts.add quote do:
+      discard
+
   # iterate over all given statements. If we find an
   # assignment, add
   for stmt in stmts:
@@ -108,9 +117,15 @@ macro when_let*(stmts: untyped): untyped =
         stmt[1]
       )
     of nnkCall:
-      if stmt[0].repr == "op":
-        # add stmts
+      if eqIdent(stmt[0], "op"):
+        # add stmts for `true` branch
         opStmts.add stmt[1]
+        if not haveFalse:
+          # afterwards nothing expected, so break
+          break
+      elif eqIdent(stmt[0], "elsedo"):
+        # add stmts for `false` branch
+        elseStmts.add stmt[1]
         # afterwards nothing expected, so break
         break
     else:
@@ -126,10 +141,12 @@ macro when_let*(stmts: untyped): untyped =
   let inCheck = quote do:
     if `asgnWith`.allIt(it):
       `opStmts`
+    else:
+      `elseStmts`
 
   # assign everything to the result statements
   result = newStmtList()
   result.add letStmts
   result.add inCheck
-  when defined(debugWhenLet):
+  when defined(debugIfLet):
     echo result.repr
