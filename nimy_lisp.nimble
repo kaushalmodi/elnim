@@ -32,10 +32,8 @@ task docs, "Deploy doc html + search index to public/ directory":
     docHackJsSource = "http://nim-lang.github.io/Nim/dochack.js" # devel docs dochack.js
   mkDir(deployDir)
   exec(genDocCmd)
-  # Hack: replace pkgName.html with index.html in the .idx file
-  echo "[dbg sed cmd] " & sedCmd
-  exec(sedCmd)
-  exec(genTheIndexCmd)
+  exec(sedCmd) # Hack: replace pkgName.html with index.html in the .idx file
+  exec(genTheIndexCmd) # Generate theindex.html only after fixing the .idx file
   if not fileExists(deployJsFile):
     withDir deployDir:
       exec("curl -LO " & docHackJsSource)
