@@ -121,3 +121,30 @@ suite "[if-let]":
     else:
       res = "It was false!"
     check res == "It was false!"
+
+  test "[if-let] false from empty seq":
+    var res = ""
+    if_let:
+      a: seq[string] = @[]
+      b = 2
+    do:
+      res = "b = " & $b
+    else:
+      res = "empty seq"
+    check res == "empty seq"
+
+  test "[if-let] two if_let after another":
+    var res = 0
+    if_let:
+      a = 5
+      b = 10
+    do:
+      res = a + b
+
+    if_let:
+      a = 1
+      b = 2
+    do:
+      res += a + b
+
+    check res == 18
