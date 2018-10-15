@@ -8,8 +8,8 @@ suite "[if-let]":
     if_let:
       n = 5
       m = n * 5
-      op:
-        res = "Hallo! " & $n & " and " & $m
+    do:
+      res = "Hallo! " & $n & " and " & $m
     check res == "Hallo! 5 and 25"
 
   test "[if-let] assignment with procedure":
@@ -18,8 +18,8 @@ suite "[if-let]":
       a = 5
       b = a * 5
       c = proc(x, y: int): int = x + y
-      op:
-        res = "Output is: " & $c(a, b)
+    do:
+      res = "Output is: " & $c(a, b)
     check res == "Output is: 30"
 
   test "[if-let] multiple line body":
@@ -27,11 +27,11 @@ suite "[if-let]":
     if_let:
       a = 5
       b = a * 5
-      op:
-        let y = a * b
-        proc test(x: int): float =
-          result = x.float
-        res = "y as float / 10.0 = " & $(test(y) / 10.0)
+    do:
+      let y = a * b
+      proc test(x: int): float =
+        result = x.float
+      res = "y as float / 10.0 = " & $(test(y) / 10.0)
     check res == "y as float / 10.0 = 12.5"
 
   test "[if-let] false by bool":
@@ -40,8 +40,8 @@ suite "[if-let]":
       a = 5
       b = a * 5
       c = false
-      op:
-        res = "Hallo! " & $a & " and " & $b
+    do:
+      res = "Hallo! " & $a & " and " & $b
     check res == ""
 
   test "[if-let] false from proc call":
@@ -52,8 +52,8 @@ suite "[if-let]":
       a = 5
       b = a * 5
       c = callFalse(a)
-      op:
-        res = "a is smaller 10!"
+    do:
+      res = "a is smaller 10!"
     check res == ""
 
   test "[if-let] assigning a seq":
@@ -61,9 +61,9 @@ suite "[if-let]":
     if_let:
       a = @[1, 2, 3]
       b = 5
-      op:
-        for x in a:
-          res.add x * b
+    do:
+      for x in a:
+        res.add x * b
     check res == @[5, 10, 15]
 
   test "[if-let] false from emtpy seq":
@@ -74,8 +74,8 @@ suite "[if-let]":
     if_let:
       a = 0
       b = emptySeq(a)
-      op:
-        res = "Seq is empty!"
+    do:
+      res = "Seq is empty!"
     check res == ""
 
   test "[if-let] non nil ref object":
@@ -85,8 +85,8 @@ suite "[if-let]":
     if_let:
       a = obj
       b = 5
-      op:
-        res = obj[] + b
+    do:
+      res = obj[] + b
     check res == 10
 
   test "[if-let] false due to nil pointer":
@@ -96,8 +96,8 @@ suite "[if-let]":
       a = 5
       b = a * 5
       c = somePtr
-      op:
-        res = "Pointer is nil: " & $(c.isNil)
+    do:
+      res = "Pointer is nil: " & $(c.isNil)
     check res == ""
 
   test "[if-let] assignment with else":
@@ -105,10 +105,10 @@ suite "[if-let]":
     if_let:
       a = 5
       b = true
-      op:
-        res = "Output: " & $a
-      elsedo:
-        res = "It was false!"
+    do:
+      res = "Output: " & $a
+    else:
+      res = "It was false!"
     check res == "Output: 5"
 
   test "[if-let] false assignment with else":
@@ -116,8 +116,8 @@ suite "[if-let]":
     if_let:
       a = 5
       b = false
-      op:
-        res = "Output: " & $a
-      elsedo:
-        res = "It was false!"
+    do:
+      res = "Output: " & $a
+    else:
+      res = "It was false!"
     check res == "It was false!"

@@ -69,7 +69,7 @@ proc isValid*[T](x: T): bool =
       echo "Invalid type: ", $(name(T))
     result = false
 
-macro if_let*(stmts: untyped): untyped =
+macro if_let*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyNode): untyped =
   ## Macro similar to Emacs Lisp's `when-let` macro.
   ## Takes a set of assignments and checks if all of those
   ## are valid (in elisp if they are `nil`) by calling `isValid`
@@ -93,43 +93,41 @@ macro if_let*(stmts: untyped): untyped =
   ##     c = proc(a, b: int): int = a + b
   ##   if [isValid(a), isValid(b), isValid(c)].allIt(it):
   ##     echo "Output is: ", c(a, b)
-  var letStmts = nnkLetSection.newTree()
-  var opStmts = newStmtList()
-  var elseStmts = newStmtList()
-
-  # check if we have a `false` branch:
-  let haveFalse = if eqIdent(stmts[^1][0], "elsedo"): true else: false
-  if not haveFalse:
-    # in this case just add a `discard` to the `elseStmts`
-    elseStmts.add quote do:
-      discard
+  var
+    letStmts = nnkLetSection.newTree()
+    doStmts = newStmtList()
+    elseStmts = newStmtList()
 
   # iterate over all given statements. If we find an
   # assignment, add
-  for stmt in stmts:
-    case stmt.kind
-    of nnkAsgn:
-      # convert each assignment to a `nnkIdentDefs`, so it's valid within
-      # a `nnkLetSection`
-      letStmts.add nnkIdentDefs.newTree(
-        stmt[0],
-        newEmptyNode(),
-        stmt[1]
-      )
-    of nnkCall:
-      if eqIdent(stmt[0], "op"):
-        # add stmts for `true` branch
-        opStmts.add stmt[1]
-        if not haveFalse:
-          # afterwards nothing expected, so break
-          break
-      elif eqIdent(stmt[0], "elsedo"):
-        # add stmts for `false` branch
-        elseStmts.add stmt[1]
-        # afterwards nothing expected, so break
-        break
-    else:
-      error("Unexpected node of kind " & $stmt.kind & " found. Content:\n" & stmt.repr)
+  for e in letExpr:
+    when defined(debugIfLet):
+      echo "[DBG] " & $e.kind & " " & e.repr
+    doAssert e.kind == nnkAsgn,
+     "Unexpected node of kind " & $e.kind & " found. Content:\n" & e.repr
+    # TODO: handle expr like " a3: seq[string] = @[]  " in if_let:
+
+    # convert each assignment to a `nnkIdentDefs`, so it's valid within
+    # a `nnkLetSection`
+    letStmts.add nnkIdentDefs.newTree(
+      e[0],
+      newEmptyNode(),
+      e[1])
+
+  when defined(debugIfLet):
+    echo "[DBG] " & $trueCond.kind & " " & trueCond.repr
+  doAssert trueCond.kind == nnkStmtList
+  for e in trueCond:
+    when defined(debugIfLet):
+      echo "[DBG in trueCond] " & $e.kind & " " & e.repr
+    doStmts.add(e)
+
+  when defined(debugIfLet):
+    echo "[DBG] " & $falseCond.kind & " " & falseCond.repr
+  for e in falseCond:
+    when defined(debugIfLet):
+      echo "[DBG in falseCond] " & $e.kind & " " & e.repr
+    elseStmts.add(e)
 
   # now call `isValid` on all RHS of the assignments
   var asgnWith: seq[NimNode]
@@ -140,13 +138,58 @@ macro if_let*(stmts: untyped): untyped =
   # body of the `op:`
   let inCheck = quote do:
     if `asgnWith`.allIt(it):
-      `opStmts`
+      `doStmts`
     else:
       `elseStmts`
 
   # assign everything to the result statements
   result = newStmtList()
   result.add letStmts
-  result.add inCheck
+  result.add inCheck            # TODO: this inCheck block needs to be inside the scope of letStmts, but how?
   when defined(debugIfLet):
-    echo result.repr
+    echo result.repr & "\n\n"
+
+
+when isMainModule:
+  echo "\n** test 1 **"
+  if_let:
+    a = 1
+    b = 2
+  do:
+    echo "both a and b are 'non-nil'"
+    echo "more stuff"
+
+  # uncommenting below "test 2" fails
+  # echo "\n** test 2 **"
+  # if_let:
+  #   a = false
+  #   b = 2
+  # do:
+  #   echo "both a and b are 'non-nil'"
+  #   echo "more stuff"
+  # else:
+  #   echo "one or more of a and b are nil'"
+  #   echo "more stuff 2"
+
+  echo "\n** test 3 **"
+  if_let:
+    a2 = false
+    b2 = 2
+  do:
+    echo "both a2 and b2 are 'non-nil'"
+    echo "more stuff"
+  else:
+    echo "one or more of a2 and b2 are nil'"
+    echo "more stuff 2"
+
+  # uncommenting below "test 4" fails
+  # echo "\n** test 4 **"
+  # if_let:
+  #   a3: seq[string] = @[]       #this fails
+  #   b3 = 2
+  # do:
+  #   echo "both a3 and b3 are 'non-nil'"
+  #   echo "more stuff"
+  # else:
+  #   echo "one or more of a3 and b3 are nil'"
+  #   echo "more stuff 2"
