@@ -29,7 +29,7 @@ task docs, "Deploy doc html + search index to public/ directory":
     genDocCmd = "nim doc --index:on -o:$1 $2" % [deployHtmlFile, srcFile]
     sedCmd = "sed -i 's|" & pkgName & r"\.html|index.html|' " & deployIdxFile
     genTheIndexCmd = "nim buildIndex -o:$1/theindex.html $1" % [deployDir]
-    docHackJsSource = "http://nim-lang.github.io/Nim/dochack.js" # devel docs dochack.js
+    docHackJsSource = "https://nim-lang.github.io/Nim/dochack.js" # devel docs dochack.js
   mkDir(deployDir)
   exec(genDocCmd)
   exec(sedCmd) # Hack: replace pkgName.html with index.html in the .idx file
