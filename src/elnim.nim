@@ -77,7 +77,7 @@ macro ifLet*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyN
   ## valid, the body after ``do:`` will be evaluated, otherwise the body
   ## after ``else:`` is evaluate.
   ##
-  ## Note: Compile with `-d:debugIfLet` to see its resulting code.
+  ## **Note**: Compile with ``-d:debugIfLet`` to see its resulting code.
   ##
   ## .. code-block::
   ##    :test:
@@ -109,8 +109,8 @@ macro ifLet*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyN
     case e.kind
     of nnkAsgn:
       # Iterate over all given statements. If we find an assignment,
-      # add it. Convert each assignment to a `nnkIdentDefs`, so it's
-      # valid within a `nnkLetSection`.
+      # add it. Convert each assignment to a ``nnkIdentDefs``, so it's
+      # valid within a ``nnkLetSection``.
       letStmts.add nnkIdentDefs.newTree(
         e[0],
         newEmptyNode(),
@@ -139,24 +139,24 @@ macro ifLet*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyN
     else:
       error("Unexpected node of kind " & $e.kind & " found. Content:\n" & e.repr)
 
-  # `newEmptyNode()` isn't really the best solution as an optional
-  # arg. Need to check for `nnkCall` and the symbol identifier.
+  # ``newEmptyNode()`` isn't really the best solution as an optional
+  # arg. Need to check for ``nnkCall`` and the symbol identifier.
   var elseStmts = newStmtList()
   if falseCond.kind == nnkCall and eqIdent(falseCond[0], "newEmptyNode"):
     elseStmts = quote do:
       discard
   else:
-    # Get content of `else:` branch.
+    # Get content of ``else:`` branch.
     elseStmts = falseCond[0]
 
-  # Now call `isValid` on all RHS of the assignments.
+  # Now call ``isValid`` on all RHS of the assignments.
   var asgnWith: seq[NimNode]
   for asgn in letStmts:
     asgnWith.add nnkCall.newTree(ident"isValid", asgn[0])
 
-  # Generate the if statement with the call to `allIt` and the body of
-  # the `do:`. If all ifLet expessions are not valid, execute the body
-  # of `else:`.
+  # Generate the if statement with the call to ``allIt`` and the body
+  # of the ``do:``. If all ifLet expessions are not valid, execute the
+  # body of ``else:``.
   let inCheck = quote do:
     if `asgnWith`.allIt(it):
       `trueCond`
