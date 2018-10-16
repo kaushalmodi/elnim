@@ -18,6 +18,40 @@ when defined(debugIfLet):
 proc dollar[T](s: T): string =
   result = $s
 
+proc car*[T](s: openArray[T]): T =
+  ## Return the first element of ``s``.
+  ##
+  ## If ``s`` has zero elements, throw an error. Unlike Emacs-Lisp,
+  ## Nim cannot return a true "nil" value in this case.
+  runnableExamples:
+    doAssert @["abc", "def", "ghi"].car() == "abc"
+    doAssert [1, 2, 3].car() == 1
+    try:
+      discard seq[string](@[]).car()
+    except AssertionError:
+      echo "Illegal: 'car' was provided a zero-length seq/array."
+
+  doAssert s.len > 0
+  return s[0]
+
+proc cdr*[T](s: openArray[T]): seq[T] =
+  ## Return a sequence of all elements excluding the first element of ``s``.
+  ##
+  ## If ``s`` has one or less elements, an empty sequence of type
+  ## **T** is returned.
+  runnableExamples:
+    doAssert @["abc", "def", "ghi"].cdr() == @["def", "ghi"]
+    doAssert [1, 2, 3].cdr() == @[2, 3]
+    doAssert [1].cdr() == seq[int](@[])
+    doAssert @["a"].cdr() == seq[string](@[])
+    doAssert seq[string](@[]).cdr() == seq[string](@[]) # zero length seq
+    doAssert array[0, int]([]).cdr() == seq[int](@[]) # zero length array
+
+  if s.len <= 0:
+    return
+  else:
+    return s[1 .. s.high]
+
 proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =
   ## Concatenate elements of ``s`` after applying ``op`` to each element.
   ## Separate each element using ``sep``.
