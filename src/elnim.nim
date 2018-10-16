@@ -15,7 +15,16 @@ export sequtils
 when defined(debugIfLet):
   import typetraits
 
+proc equal[T](x, y: T): bool =
+  ## Generic proc to check if inputs ``x`` and ``y`` are equal.
+  ##
+  ## This proc is used in ``assoc``.
+  result = x == y
+
 proc dollar[T](s: T): string =
+  ## Generic proc to stringify input ``s``.
+  ##
+  ## This proc is used in ``mapconcat``.
   result = $s
 
 proc car*[T](s: openArray[T]): T =
@@ -51,6 +60,28 @@ proc cdr*[T](s: openArray[T]): seq[T] =
     return
   else:
     return s[1 .. s.high]
+
+proc assoc*[T](alist: openArray[seq[T]]; key: T; testproc: proc(x, y: T): bool = equal): seq[T] =
+  ## Return the first nested sequence whose first element matches with
+  ## ``key`` using the ``testproc`` proc (which defaults to ``equal``).
+  ##
+  ## Input ``alist`` is an array or sequence of sequences of type
+  ## ``seq[T]``.
+  ##
+  ## The ``alist`` and ``key`` arguments are swapped compared to its
+  ## Emacs-Lisp version so that we can conveniently do
+  ## ``alist.assoc(key)``.
+  runnableExamples:
+    doAssert @[@["a", "b"], @["c", "d"]].assoc("a") == @["a", "b"]
+    doAssert [@[1.11, 2.11, 3.11], @[4.11, 5.11, 6.11], @[4.11, 40.11, 400.11]].assoc(4.11) == @[4.11, 5.11, 6.11]
+    doAssert [@[1, 2, 3], @[], @[4, 40, 400]].assoc(10) == seq[int](@[]) # alist containing a zero-length seq
+    doAssert seq[seq[string]](@[]).assoc("a") == seq[string](@[]) # zero length alist
+
+  for s in alist:
+    if s.len == 0:
+      continue                 # car cannot accept seqs of zero length
+    if testproc(s.car(), key):
+      return s
 
 proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =
   ## Concatenate elements of ``s`` after applying ``op`` to each element.

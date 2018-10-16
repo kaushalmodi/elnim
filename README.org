@@ -27,6 +27,15 @@ Error if arg is not nil and not a cons cell.  See also ‘cdr-safe’.
 See Info node ‘[[http://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html][(elisp)Cons Cells]]’ for a discussion of related basic
 Lisp concepts such as car, cdr, cons cell and list.
 #+end_quote
+** ~assoc~
+#+begin_quote
+~(assoc KEY LIST &optional TESTFN)~
+
+Return non-nil if KEY is equal to the car of an element of LIST.
+The value is actually the first element of LIST whose car equals KEY.
+
+Equality is defined by TESTFN if non-nil or by ‘equal’ if nil.
+#+end_quote
 ** ~mapconcat~
 #+begin_quote
 ~(mapconcat FUNCTION SEQUENCE SEPARATOR)~
