@@ -41,6 +41,15 @@ nil; i.e. SYMBOL can be omitted if only the test result is of
 interest.
 #+end_quote
 * Development
+** Requirement
+Needs Nim built from its ~devel~ branch (<2018-10-16 Tue>).
+** Prep
+Do this step *first*, before you execute any of the below "nim"
+commands:
+#+begin_example
+# cd to the repo root
+git clone https://github.com/kaushalmodi/nim_config && cp nim_config/config.nims .
+#+end_example
 ** Testing
 #+begin_example
 nim test
