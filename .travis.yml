@@ -42,7 +42,7 @@ install:
 
 script:
   - nim -v
-  - curl -OL https://github.com/kaushalmodi/config.nims # Get my global config.nims
+  - git clone https://github.com/kaushalmodi/config.nims && cp config.nims/config.nims . # Get my global config.nims
   - nim test
   - nim docs
 
