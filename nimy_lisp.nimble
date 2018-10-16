@@ -2,14 +2,14 @@
 
 version       = "0.1.0"
 author        = "Kaushal Modi"
-description   = "Emacs-Lisp equivalent procs and templates in Nim"
+description   = "Emacs-Lisp equivalent procs/templates/macros in Nim"
 license       = "MIT"
 srcDir        = "src"
 
 
 # Dependencies
 
-requires "nim >= 0.19.0"
+requires "nim >= 0.19.1"
 
 import ospaths # for `/`
 import strutils # for `%`

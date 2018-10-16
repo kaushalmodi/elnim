@@ -69,45 +69,56 @@ proc isValid*[T](x: T): bool =
       echo "Invalid type: ", $(name(T))
     result = false
 
-macro if_let*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyNode()): untyped =
-  ## Macro similar to Emacs Lisp's `when-let` macro.
-  ## Takes a set of assignments and checks if all of those
-  ## are valid (in elisp if they are `nil`) by calling `isValid`
-  ## on the values being assigned. If all are valid, the body
-  ## after `op:` will be evaluated, otherwise nothing happens.
-  ## Note: compile with `-d:debugIfLet` to see its resulting
-  ## code.
+macro ifLet*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyNode()): untyped =
+  ## Macro similar to Emacs Lisp's ``if-let*`` macro.
+  ## Takes a set of assignments ``letExpr`` and checks if all of those
+  ## are valid (in elisp, "validity" is checked by non-nil-ness) by
+  ## calling ``isValid`` on the values being assigned. If all are
+  ## valid, the body after ``do:`` will be evaluated, otherwise the body
+  ## after ``else:`` is evaluate.
   ##
-  ## ..code-block:
-  ##   if_let:
-  ##     a = 5
-  ##     b = a * 5
-  ##     c = proc(a, b: int): int = a + b
-  ##     op:
-  ##       echo "Output is: ", c(a, b)
+  ## Note: Compile with `-d:debugIfLet` to see its resulting code.
   ##
-  ##   # which will be rewritten to:
-  ##   let
-  ##     a = 5
-  ##     b = a * 5
-  ##     c = proc(a, b: int): int = a + b
-  ##   if [isValid(a), isValid(b), isValid(c)].allIt(it):
-  ##     echo "Output is: ", c(a, b)
+  ## .. code-block::
+  ##    :test:
+  ##    ifLet:
+  ##      a = 5
+  ##      b = a * 5
+  ##      c = proc(a, b: int): int = a + b
+  ##    do:
+  ##      echo "Output is: ", c(a, b)
+  ##    else:
+  ##      echo "Either a or b had an invalid value."
+  ##
+  ## This macro rewrites the above code to:
+  ##
+  ## .. code-block::
+  ##    block:
+  ##      let
+  ##        a = 5
+  ##        b = a * 5
+  ##        c = proc (a, b: int): int =
+  ##          a + b
+  ##      if [isValid(a), isValid(b), isValid(c)].allIt(it):
+  ##        echo "Output is: ", c(a, b)
+  ##      else:
+  ##        echo "Either a or b had an invalid value."
 
   var letStmts = nnkLetSection.newTree()
-  # iterate over all given statements. If we find an
-  # assignment, add
   for e in letExpr:
     case e.kind
     of nnkAsgn:
-      # convert each assignment to a `nnkIdentDefs`, so it's valid within
-      # a `nnkLetSection`
+      # Iterate over all given statements. If we find an assignment,
+      # add it. Convert each assignment to a `nnkIdentDefs`, so it's
+      # valid within a `nnkLetSection`.
       letStmts.add nnkIdentDefs.newTree(
         e[0],
         newEmptyNode(),
         e[1])
     of nnkCall:
-      # tree like the following
+      # If we find a tree like the following, extract the assign
+      # statements from those.
+      #
       # Call
       #   Ident "a"              # need this
       #   StmtList
@@ -128,30 +139,31 @@ macro if_let*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmpty
     else:
       error("Unexpected node of kind " & $e.kind & " found. Content:\n" & e.repr)
 
-  # `newEmptyNode()` isn't really the best solution as an optional arg. Need
-  # to check for `nnkCall` and the symbol identifier
+  # `newEmptyNode()` isn't really the best solution as an optional
+  # arg. Need to check for `nnkCall` and the symbol identifier.
   var elseStmts = newStmtList()
   if falseCond.kind == nnkCall and eqIdent(falseCond[0], "newEmptyNode"):
     elseStmts = quote do:
       discard
   else:
-    # get content of `Else` branch
+    # Get content of `else:` branch.
     elseStmts = falseCond[0]
 
-  # now call `isValid` on all RHS of the assignments
+  # Now call `isValid` on all RHS of the assignments.
   var asgnWith: seq[NimNode]
   for asgn in letStmts:
     asgnWith.add nnkCall.newTree(ident"isValid", asgn[0])
 
-  # generate the if statement with the call to `allIt` and the
-  # body of the `op:`
+  # Generate the if statement with the call to `allIt` and the body of
+  # the `do:`. If all ifLet expessions are not valid, execute the body
+  # of `else:`.
   let inCheck = quote do:
     if `asgnWith`.allIt(it):
       `trueCond`
     else:
       `elseStmts`
 
-  # assign everything to the result statements
+  # Assign everything to the result statements.
   result = newStmtList()
   result.add letStmts
   result.add inCheck

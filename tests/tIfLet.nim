@@ -1,20 +1,20 @@
 import nimy_lisp
 import unittest
 
-suite "[if-let]":
+suite "[ifLet]":
 
-  test "[if-let] simple assignments":
+  test "[ifLet] simple assignments":
     var res = ""
-    if_let:
+    ifLet:
       n = 5
       m = n * 5
     do:
       res = "Hallo! " & $n & " and " & $m
     check res == "Hallo! 5 and 25"
 
-  test "[if-let] assignment with procedure":
+  test "[ifLet] assignment with procedure":
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = a * 5
       c = proc(x, y: int): int = x + y
@@ -22,9 +22,9 @@ suite "[if-let]":
       res = "Output is: " & $c(a, b)
     check res == "Output is: 30"
 
-  test "[if-let] multiple line body":
+  test "[ifLet] multiple line body":
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = a * 5
     do:
@@ -34,9 +34,9 @@ suite "[if-let]":
       res = "y as float / 10.0 = " & $(test(y) / 10.0)
     check res == "y as float / 10.0 = 12.5"
 
-  test "[if-let] false by bool":
+  test "[ifLet] false by bool":
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = a * 5
       c = false
@@ -44,11 +44,11 @@ suite "[if-let]":
       res = "Hallo! " & $a & " and " & $b
     check res == ""
 
-  test "[if-let] false from proc call":
+  test "[ifLet] false from proc call":
     proc callFalse(x: int): bool =
       result = if x < 10: false else: true
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = a * 5
       c = callFalse(a)
@@ -56,9 +56,9 @@ suite "[if-let]":
       res = "a is smaller 10!"
     check res == ""
 
-  test "[if-let] assigning a seq":
+  test "[ifLet] assigning a seq":
     var res: seq[int] = @[]
-    if_let:
+    ifLet:
       a = @[1, 2, 3]
       b = 5
     do:
@@ -66,33 +66,33 @@ suite "[if-let]":
         res.add x * b
     check res == @[5, 10, 15]
 
-  test "[if-let] false from emtpy seq":
+  test "[ifLet] false from emtpy seq":
     proc emptySeq(x: int): seq[int] =
       for i in 0 ..< x:
         result.add i
     var res = ""
-    if_let:
+    ifLet:
       a = 0
       b = emptySeq(a)
     do:
       res = "Seq is empty!"
     check res == ""
 
-  test "[if-let] non nil ref object":
+  test "[ifLet] non nil ref object":
     var obj = new int
     obj[] = 5
     var res = 0
-    if_let:
+    ifLet:
       a = obj
       b = 5
     do:
       res = obj[] + b
     check res == 10
 
-  test "[if-let] false due to nil pointer":
+  test "[ifLet] false due to nil pointer":
     var somePtr: pointer = nil
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = a * 5
       c = somePtr
@@ -100,9 +100,9 @@ suite "[if-let]":
       res = "Pointer is nil: " & $(c.isNil)
     check res == ""
 
-  test "[if-let] assignment with else":
+  test "[ifLet] assignment with else":
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = true
     do:
@@ -111,9 +111,9 @@ suite "[if-let]":
       res = "It was false!"
     check res == "Output: 5"
 
-  test "[if-let] false assignment with else":
+  test "[ifLet] false assignment with else":
     var res = ""
-    if_let:
+    ifLet:
       a = 5
       b = false
     do:
@@ -122,9 +122,9 @@ suite "[if-let]":
       res = "It was false!"
     check res == "It was false!"
 
-  test "[if-let] false from empty seq":
+  test "[ifLet] false from empty seq":
     var res = ""
-    if_let:
+    ifLet:
       a: seq[string] = @[]
       b = 2
     do:
@@ -133,15 +133,15 @@ suite "[if-let]":
       res = "empty seq"
     check res == "empty seq"
 
-  test "[if-let] two if_let after another":
+  test "[ifLet] two ifLet after another":
     var res = 0
-    if_let:
+    ifLet:
       a = 5
       b = 10
     do:
       res = a + b
 
-    if_let:
+    ifLet:
       a = 1
       b = 2
     do:
