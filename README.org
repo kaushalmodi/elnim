@@ -1,4 +1,4 @@
-#+title: Nimy Lisp
+#+title: ElNim
 #+author: Kaushal Modi
 
 Collection of Nim procs/templates/macros which can serve as "phew! I
