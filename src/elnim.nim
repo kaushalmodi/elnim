@@ -7,7 +7,7 @@
 ##
 ## Source
 ## ======
-## `Repo link <https://github.com/kaushalmodi/nimy_lisp>`_
+## `Repo link <https://github.com/kaushalmodi/elnim>`_
 
 import macros, sequtils
 export sequtils

@@ -14,7 +14,7 @@ requires "nim >= 0.19.1"
 import ospaths # for `/`
 import strutils # for `%`
 let
-  pkgName = "nimy_lisp"
+  pkgName = "elnim"
   srcFile = thisDir() / "src" / (pkgName & ".nim")
 
 task test, "Run tests via 'nim doc' and runnableExamples and tests in tests dir":

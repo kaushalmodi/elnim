@@ -1,4 +1,4 @@
-import nimy_lisp
+import elnim
 import unittest
 
 suite "[ifLet]":

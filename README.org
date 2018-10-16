@@ -5,7 +5,7 @@ Collection of Nim procs/templates/macros which can serve as "phew! I
 am glad Nim has this!" for Emacs/Emacs-Lisp/Lisp enthusiasts.
 
 * Documentation
-[[https://kaushalmodi.github.io/nimy_lisp/]]
+[[https://kaushalmodi.github.io/elnim/]]
 * Testing
 #+begin_example
 nimble test
