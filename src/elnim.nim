@@ -12,6 +12,9 @@
 import macros, sequtils
 export sequtils
 
+when defined(debugIfLet):
+  import typetraits
+
 proc dollar[T](s: T): string =
   result = $s
 
@@ -53,6 +56,11 @@ proc member*[T](el: T; s: openArray[T]): bool =
     result = true
 
 proc isValid*[T](x: T): bool =
+  ## Return ``true`` if ``x`` represents something like a *non-nil*
+  ## value in Emacs-Lisp.
+  ##
+  ## **Note**: Compile with ``-d:debugIfLet`` to print if ``x`` is of
+  ## unsupported type.
   when T is bool:
     result = x
   elif T is SomeNumber:
@@ -64,7 +72,7 @@ proc isValid*[T](x: T): bool =
   elif T is ptr | pointer | ref:
     result = not x.isNil
   else:
-    # currently not supported
+    # Types currently not supported.
     when defined(debugIfLet):
       echo "Invalid type: ", $(name(T))
     result = false
