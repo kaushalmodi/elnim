@@ -36,6 +36,14 @@ The value is actually the first element of LIST whose car equals KEY.
 
 Equality is defined by TESTFN if non-nil or by ‘equal’ if nil.
 #+end_quote
+** ~delete~
+#+begin_quote
+~(delete ELT SEQ)~
+
+Delete members of SEQ which are ‘equal’ to ELT, and return the result.
+SEQ must be a sequence (i.e. a list, a vector, or a string).
+The return value is a sequence of the same type.
+#+end_quote
 ** ~mapconcat~
 #+begin_quote
 ~(mapconcat FUNCTION SEQUENCE SEPARATOR)~

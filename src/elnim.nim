@@ -18,7 +18,7 @@ when defined(debugIfLet):
 proc equal[T](x, y: T): bool =
   ## Generic proc to check if inputs ``x`` and ``y`` are equal.
   ##
-  ## This proc is used in ``assoc``.
+  ## This proc is used in ``assoc`` and ``delete``.
   result = x == y
 
 proc dollar[T](s: T): string =
@@ -82,6 +82,19 @@ proc assoc*[T](alist: openArray[seq[T]]; key: T; testproc: proc(x, y: T): bool =
       continue                 # car cannot accept seqs of zero length
     if testproc(s.car(), key):
       return s
+
+proc delete*[T](s: openArray[T]; el: T; testproc: proc(x, y: T): bool = equal): seq[T] =
+  ## Return a sequence containing all elements from ``s`` that do not
+  ## match with ``el``. The match is done using the ``testproc`` proc
+  ## (which defaults to ``equal``).
+  runnableExamples:
+    doAssert @[123, 456, 789, 123].delete(123) == @[456, 789]
+    doAssert ["123", "456", "789", "123"].delete("456") == @["123", "789", "123"]
+    doAssert seq[string](@[]).delete("a") == seq[string](@[])
+
+  for sElem in s:
+    if not testproc(sElem, el):
+      result.add(sElem)
 
 proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =
   ## Concatenate elements of ``s`` after applying ``op`` to each element.
