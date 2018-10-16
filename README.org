@@ -6,11 +6,7 @@ am glad Nim has this!" for Emacs/Emacs-Lisp/Lisp enthusiasts.
 
 * Documentation
 [[https://kaushalmodi.github.io/elnim/]]
-* Testing
-#+begin_example
-nimble test
-#+end_example
-* Emacs-Lisp functions implemented
+* Emacs-Lisp functions implemented in this library
 ** ~mapconcat~
 #+begin_quote
 ~(mapconcat FUNCTION SEQUENCE SEPARATOR)~
@@ -44,3 +40,13 @@ be of the form (VALUEFORM), which is evaluated and checked for
 nil; i.e. SYMBOL can be omitted if only the test result is of
 interest.
 #+end_quote
+* Development
+** Testing
+#+begin_example
+nimble test
+#+end_example
+** Generate doc
+Create the HTML page and associated search index in ~<repo>/public/~.
+#+begin_example
+nimble docs
+#+end_example
