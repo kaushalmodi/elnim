@@ -43,10 +43,10 @@ interest.
 * Development
 ** Testing
 #+begin_example
-nimble test
+nim test
 #+end_example
 ** Generate doc
 Create the HTML page and associated search index in ~<repo>/public/~.
 #+begin_example
-nimble docs
+nim docs
 #+end_example

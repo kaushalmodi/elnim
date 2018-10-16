@@ -34,18 +34,17 @@ install:
         ./koch boot -d:release;
         rm -rf csources;
       )"
-  - "{ [ -f ${NIMDIR}/bin/nimble ]; } ||
-      ( cd ${NIMDIR};
-        ./koch nimble;
-      )"
+  # - "{ [ -f ${NIMDIR}/bin/nimble ]; } ||
+  #     ( cd ${NIMDIR};
+  #       ./koch nimble;
+  #     )"
   - export PATH="${NIMDIR}/bin:${PATH}"
 
 script:
   - nim -v
-  - nimble test       # Generates doc and tests using runnableExamples
+  - nim test
+  - nim docs
 
-before_deploy:
-  - nimble docs
 deploy:
   provider: pages
   # local-dir *has* to be a relative path from the repo root.
