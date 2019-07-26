@@ -9,7 +9,7 @@
 ## ======
 ## `Repo link <https://github.com/kaushalmodi/elnim>`_
 
-import macros, sequtils
+import std/[macros, sequtils]
 export sequtils
 
 when defined(debugIfLet):
@@ -76,8 +76,10 @@ proc assoc*[T](alist: openArray[seq[T]]; key: T; testproc: proc(x,
     doAssert @[@["a", "b"], @["c", "d"]].assoc("a") == @["a", "b"]
     doAssert [@[1.11, 2.11, 3.11], @[4.11, 5.11, 6.11], @[4.11, 40.11,
         400.11]].assoc(4.11) == @[4.11, 5.11, 6.11]
-    doAssert [@[1, 2, 3], @[], @[4, 40, 400]].assoc(10) == seq[int](@[]) # alist containing a zero-length seq
-    doAssert seq[seq[string]](@[]).assoc("a") == seq[string](@[]) # zero length alist
+    # alist containing a zero-length seq
+    doAssert [@[1, 2, 3], @[], @[4, 40, 400]].assoc(10) == seq[int](@[])
+    # zero length alist
+    doAssert seq[seq[string]](@[]).assoc("a") == seq[string](@[])
 
   for s in alist:
     if s.len == 0:
@@ -92,7 +94,8 @@ proc delete*[T](s: openArray[T]; el: T; testproc: proc(x,
   ## (which defaults to ``equal``).
   runnableExamples:
     doAssert @[123, 456, 789, 123].delete(123) == @[456, 789]
-    doAssert ["123", "456", "789", "123"].delete("456") == @["123", "789", "123"]
+    doAssert ["123", "456", "789", "123"].delete("456") ==
+      @["123", "789", "123"]
     doAssert seq[string](@[]).delete("a") == seq[string](@[])
 
   for sElem in s:
@@ -104,7 +107,8 @@ proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(
   ## Concatenate elements of ``s`` after applying ``op`` to each element.
   ## Separate each element using ``sep``.
   ##
-  ## The signature of this proc differs from its equivalent ``mapconcat`` in Emacs,
+  ## The signature of this proc differs from its equivalent ``mapconcat``
+  ## in Emacs,
   ## - so that we can do ``s.mapconcat()`` in Nim.
   ## - Also it is more common for a user to change the ``sep`` parameter
   ##   than the ``op`` parameter, so move ``op`` to the last position.
@@ -112,7 +116,8 @@ proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(
     doAssert @["abc", "def", "ghi"].mapconcat() == "abc def ghi"
     doAssert ["abc", "def", "ghi"].mapconcat() == "abc def ghi"
     doAssert [1, 2, 3].mapconcat() == "1 2 3"
-    doAssert [1, 2, 3].mapconcat("\n", proc(x: int): string = "Ha: " & $x) == "Ha: 1\nHa: 2\nHa: 3"
+    doAssert [1, 2, 3].mapconcat("\n", proc(x: int): string = "Ha: " & $x) ==
+      "Ha: 1\nHa: 2\nHa: 3"
     doAssert seq[string](@[]).mapconcat() == ""
 
   for i, x in s:
@@ -228,7 +233,8 @@ macro ifLet*(letExpr: untyped; trueCond: untyped;
         asgn[0],
         asgn[1])
     else:
-      error("Unexpected node of kind " & $e.kind & " found. Content:\n" & e.repr)
+      error("Unexpected node of kind " & $e.kind &
+        " found. Content:\n" & e.repr)
 
   # ``newEmptyNode()`` isn't really the best solution as an optional
   # arg. Need to check for ``nnkCall`` and the symbol identifier.
