@@ -61,7 +61,8 @@ proc cdr*[T](s: openArray[T]): seq[T] =
   else:
     return s[1 .. s.high]
 
-proc assoc*[T](alist: openArray[seq[T]]; key: T; testproc: proc(x, y: T): bool = equal): seq[T] =
+proc assoc*[T](alist: openArray[seq[T]]; key: T; testproc: proc(x,
+    y: T): bool = equal): seq[T] =
   ## Return the first nested sequence whose first element matches with
   ## ``key`` using the ``testproc`` proc (which defaults to ``equal``).
   ##
@@ -73,17 +74,19 @@ proc assoc*[T](alist: openArray[seq[T]]; key: T; testproc: proc(x, y: T): bool =
   ## ``alist.assoc(key)``.
   runnableExamples:
     doAssert @[@["a", "b"], @["c", "d"]].assoc("a") == @["a", "b"]
-    doAssert [@[1.11, 2.11, 3.11], @[4.11, 5.11, 6.11], @[4.11, 40.11, 400.11]].assoc(4.11) == @[4.11, 5.11, 6.11]
+    doAssert [@[1.11, 2.11, 3.11], @[4.11, 5.11, 6.11], @[4.11, 40.11,
+        400.11]].assoc(4.11) == @[4.11, 5.11, 6.11]
     doAssert [@[1, 2, 3], @[], @[4, 40, 400]].assoc(10) == seq[int](@[]) # alist containing a zero-length seq
     doAssert seq[seq[string]](@[]).assoc("a") == seq[string](@[]) # zero length alist
 
   for s in alist:
     if s.len == 0:
-      continue                 # car cannot accept seqs of zero length
+      continue # car cannot accept seqs of zero length
     if testproc(s.car(), key):
       return s
 
-proc delete*[T](s: openArray[T]; el: T; testproc: proc(x, y: T): bool = equal): seq[T] =
+proc delete*[T](s: openArray[T]; el: T; testproc: proc(x,
+    y: T): bool = equal): seq[T] =
   ## Return a sequence containing all elements from ``s`` that do not
   ## match with ``el``. The match is done using the ``testproc`` proc
   ## (which defaults to ``equal``).
@@ -96,7 +99,8 @@ proc delete*[T](s: openArray[T]; el: T; testproc: proc(x, y: T): bool = equal): 
     if not testproc(sElem, el):
       result.add(sElem)
 
-proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(x: T): string = dollar): string =
+proc mapconcat*[T](s: openArray[T]; sep = " "; op: proc(
+    x: T): string = dollar): string =
   ## Concatenate elements of ``s`` after applying ``op`` to each element.
   ## Separate each element using ``sep``.
   ##
@@ -155,7 +159,8 @@ proc isValid*[T](x: T): bool =
       echo "Invalid type: ", $(name(T))
     result = false
 
-macro ifLet*(letExpr: untyped, trueCond: untyped, falseCond: untyped = newEmptyNode()): untyped =
+macro ifLet*(letExpr: untyped; trueCond: untyped;
+    falseCond: untyped = newEmptyNode()): untyped =
   ## Macro similar to Emacs Lisp's ``if-let*`` macro.
   ## Takes a set of assignments ``letExpr`` and checks if all of those
   ## are valid (in elisp, "validity" is checked by non-nil-ness) by
