@@ -1,0 +1,10 @@
+Introduction	index.html#introduction	 Introduction	
+Source	index.html#source	 Source	
+car	index.html#car,openArray[T]	elnim: car[T](s: openArray[T]): T	
+cdr	index.html#cdr,openArray[T]	elnim: cdr[T](s: openArray[T]): seq[T]	
+assoc	index.html#assoc,openArray[seq[T]],T,proc(T,T)	elnim: assoc[T](alist: openArray[seq[T]]; key: T;\n         testproc: proc (x, y: T): bool = equal): seq[T]	
+delete	index.html#delete,openArray[T],T,proc(T,T)	elnim: delete[T](s: openArray[T]; el: T; testproc: proc (x, y: T): bool = equal): seq[T]	
+mapconcat	index.html#mapconcat,openArray[T],string,proc(T)	elnim: mapconcat[T](s: openArray[T]; sep = &quot; &quot;; op: proc (x: T): string = dollar): string	
+member	index.html#member,T,openArray[T]	elnim: member[T](el: T; s: openArray[T]): bool	
+isValid	index.html#isValid,T	elnim: isValid[T](x: T): bool	
+ifLet	index.html#ifLet.m,untyped,untyped,untyped	elnim: ifLet(letExpr: untyped; trueCond: untyped; falseCond: untyped = newEmptyNode()): untyped	
