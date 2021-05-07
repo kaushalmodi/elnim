@@ -7,6 +7,8 @@ cache:
 
 env:
   global:
+    # - CSOURCESREPO="https://github.com/nim-lang/csources"
+    - CSOURCESREPO="https://github.com/nim-lang/csources_v1" # https://github.com/nim-lang/Nim/issues/17907#issuecomment-830863341
     - NIMREPO="https://github.com/nim-lang/Nim"
     - NIMVER="$(git ls-remote ${NIMREPO} devel | cut -f 1)"
     - NIMDIR="${TRAVIS_BUILD_DIR}/nim/${NIMVER}"
@@ -32,8 +34,9 @@ install:
       mkdir -p nim
       git clone --single-branch --branch devel --depth=1 "${NIMREPO}" "${NIMDIR}"
       cd "${NIMDIR}" || exit
-      [ -d csources ] || git clone --depth 1 https://github.com/nim-lang/csources.git
+      [ -d csources ] || git clone --depth 1 "${CSOURCESREPO}" csources
       cd csources
+      chmod a+x build.sh
       sh build.sh
       cd ..
       ./bin/nim c koch
