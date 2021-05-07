@@ -34,15 +34,7 @@ install:
       mkdir -p nim
       git clone --single-branch --branch devel --depth=1 "${NIMREPO}" "${NIMDIR}"
       cd "${NIMDIR}" || exit
-      [ -d csources ] || git clone --depth 1 "${CSOURCESREPO}" csources
-      cd csources
-      chmod a+x build.sh
-      sh build.sh
-      cd ..
-      ./bin/nim c koch
-      ./koch boot -d:release
-      # After building nim, wipe csources to save on cache space.
-      rm -rf csources
+      sh build_all.sh
       # Restore the backed up config.nims if present.
       if [[ -f "${TRAVIS_BUILD_DIR}/config.nims.bkp" ]]
       then
