@@ -1,6 +1,9 @@
 #+title: ElNim
 #+author: Kaushal Modi
 
+[[https://github.com/kaushalmodi/elnim/actions/workflows/test.yml][https://github.com/kaushalmodi/elnim/actions/workflows/test.yml/badge.svg]]
+[[https://github.com/kaushalmodi/elnim/actions/workflows/docs.yml][https://github.com/kaushalmodi/elnim/actions/workflows/docs.yml/badge.svg]]
+
 Collection of Nim procs/templates/macros which can serve as "phew! I
 am glad Nim has this!" for Emacs/Emacs-Lisp/Lisp enthusiasts.
 
